@@ -26,9 +26,9 @@ docker run -p 7860:7860 -d ghcr.io/ilanaliouchouche/my-cv
    cd my-ai-cv
    ```
 
-2. Ensure the assistant/models directory is created and populated as the model files are not pushed to the repository due to their size. Place the model files inside this directory.
+2. Ensure the `assistant/models` directory is created and populated as the model files are not pushed to the repository due to their size. Place the model files inside this directory.
 
-3. Modify the .env file to match the model configurations, specifically the LLM_PATH should point to the model file within the assistant/models directory.
+3. Modify the `.env` file to match the model configurations, specifically the `LLM_PATH` should point to the model file within the `assistant/models` directory.
 
 4. Run the application:
     ```bash
