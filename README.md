@@ -19,6 +19,8 @@ Run the following command to pull the image from the registry and start the serv
 docker run -p 7860:7860 -d ghcr.io/ilanaliouchouche/my-cv
 ```
 
+The model currently in the container is: [microsoft/Phi-3-mini-4k-instruct-gguf](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf)
+
 #### Option 2: Cloning and Running Locally
 1. Clone the repository:
    ```bash
