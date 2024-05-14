@@ -45,5 +45,5 @@ docker run -p 7860:7860 -d ghcr.io/ilanaliouchouche/my-cv
 | **Chroma**   | Replace the content of `assistant/chromadb` with your own vector database containing the information you want to share.             |
 
 ### Customization 
-If you wish to adapt the project for your personal CV, please **FORK** the repo.You must ensure the `LLM_PATH` is correctly set in your `.env` file and update the `ChatbotModel` class as necessary to align with your model's specifications.
+If you wish to adapt the project for your personal CV, please **FORK** the repo. You must ensure the `LLM_PATH` is correctly set in your `.env` file and update the `ChatbotModel` class as necessary to align with your model's specifications.
 
