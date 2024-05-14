@@ -44,5 +44,5 @@ docker run -p 7860:7860 -d ghcr.io/ilanaliouchouche/my-cv
 | **Template**   | Inside `assistant/app/ChatbotModel`, it is strongly recommended to update the static `template` variable with instructions tailored to the model used.             |
 
 ### Customization 
-If you wish to adapt the project for your personal CV, please **FORK** the repo.You must ensure the `LLM_PATH` is correctly set in your `.env` file and update the `ChatbotModel` class as necessary to align with your model's specifications. |
+If you wish to adapt the project for your personal CV, please **FORK** the repo.You must ensure the `LLM_PATH` is correctly set in your `.env` file and update the `ChatbotModel` class as necessary to align with your model's specifications.
 
