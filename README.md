@@ -41,7 +41,7 @@ docker run -p 7860:7860 -d ghcr.io/ilanaliouchouche/my-cv
 |----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Model**      | The project uses the `gemma-2b-it-q4_k_m.gguf` model, specified in the `.env` file.                                                                                |
 | **LLM_PATH**   | It is crucial to adjust the `LLM_PATH` variable in the `.env` file to point to the correct model file in the `assistant/models` directory.                         |
-| **Template**   | Inside `assistant/ChatbotModel`, it is strongly recommended to update the static `template` variable with instructions tailored to the model used.             |
+| **Template**   | Inside `assistant/ChatbotModel`, it is strongly recommended to update the static `TEMPLATE` variable with instructions tailored to the model used.             |
 | **Chroma**   | Replace the content of `assistant/chromadb` with your own vector database containing the information you want to share.             |
 
 ### Customization 
