@@ -23,7 +23,7 @@ docker run -p 7860:7860 -d ghcr.io/ilanaliouchouche/my-cv
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/my-ai-cv.git
-   cd my-ai-cv
+   cd my-ai-cv/assistant
    ```
 
 2. Ensure the `assistant/models` directory is created and populated as the model files are not pushed to the repository due to their size. Place the model files inside this directory.
@@ -32,7 +32,7 @@ docker run -p 7860:7860 -d ghcr.io/ilanaliouchouche/my-cv
 
 4. Run the application:
     ```bash
-    python assistant/app.py
+    python app.py
     ```
 
 ## Configuration & Customization

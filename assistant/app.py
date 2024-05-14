@@ -1,16 +1,20 @@
-from langchain.vectorstores.chroma import Chroma
-from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from langchain.chains import ConversationalRetrievalChain, RetrievalQA
-import gradio as gr
-from langchain.schema import LLMResult
-from threading import Thread
+import os
+import dotenv
+
+from typing import Any, Dict, Generator, List, Tuple, Union
+
 from queue import SimpleQueue
+from threading import Thread
+
+import gradio as gr
+
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain.chains import ConversationalRetrievalChain, RetrievalQA
+from langchain.schema import LLMResult
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.prompts import PromptTemplate
 from langchain_community.llms import LlamaCpp
-from typing import Any, Dict, Generator, List, Tuple, Union
-import dotenv
-import os
 
 # Load environment variables
 dotenv.load_dotenv(dotenv.find_dotenv())
@@ -26,25 +30,37 @@ class ChatbotModel:
     """
 
     TEMPLATE = """
-    You are the assistant of Ilan, a Computer Science student of 22 years old at the University of Paris-Saclay, living in Savigny-sur-Orge.
-    You can answer the user's question about Ilan with the most relevant information given about Ilan. You can give any INFORMATIONS about Ilan.
-    If you don't know the answer, or the question is not about Ilan, you HAVE TO say "I don't know".
-    You have the following context where you can find information about Ilan : {context}.
+    <|user|>
+    I will ask you a question about Ilan given the context. Are you ready?
+    <|assistant|>
+    Yes of course. I am the assistant of Ilan, a Computer Science student of
+    22 years old at the University of Paris-Saclay, living in Savigny-sur-Orge.
+    I can answer the user's question about Ilan with the most relevant
+    information you will give me about Ilan.
+    I can give any INFORMATIONS about Ilan to me. If I don't know the answer,
+    or the question is not about Ilan, I will say "I don't know".
+    <|user|>
+    Ok, thanks. There is the context where you can find
+    information about Ilan for answering the question:
+    {context}.
+    <|end|>
     ---------------------------------------------------------------------
-    The question of the user is: {question}
+    And The question of the user is:
+    {question}
     ---------------------------------------------------------------------
+    <|assistant|>
     Answer: """
 
     def __init__(self,
-                 model_name : str,
-                 device : str,
-                 norm : bool, 
-                 emb_cache : str,
-                 llm_model_path : str,
-                 temperature : float, 
-                 top_p : float,
-                 max_tokens : int, 
-                 template : str = TEMPLATE) -> None:
+                 model_name: str,
+                 device: str,
+                 norm: bool,
+                 emb_cache: str,
+                 llm_model_path: str,
+                 temperature: float,
+                 top_p: float,
+                 max_tokens: int,
+                 template: str = TEMPLATE) -> None:
         """
         Initialize the ChatbotModel class.
 
@@ -59,15 +75,22 @@ class ChatbotModel:
             - max_tokens : int : The maximum tokens to use.
         """
         self.prompt_template = PromptTemplate.from_template(template)
-        self.model = self.__set_embedding_model(model_name, device, norm, emb_cache)
-        self.llm = LlamaCpp(model_path=llm_model_path, callbacks=[], temperature=temperature, top_p=top_p, max_tokens=max_tokens)
+        self.model = self.__set_embedding_model(model_name,
+                                                device,
+                                                norm,
+                                                emb_cache)
+        self.llm = LlamaCpp(model_path=llm_model_path,
+                            callbacks=[],
+                            temperature=temperature,
+                            top_p=top_p,
+                            max_tokens=max_tokens)
         self.qa = self.__init_conversational_chain()
 
     def __set_embedding_model(self,
-                              model_name : str, 
-                              device : str,
-                              norm : bool,
-                              emb_cache : str) -> HuggingFaceEmbeddings:
+                              model_name: str,
+                              device: str,
+                              norm: bool,
+                              emb_cache: str) -> HuggingFaceEmbeddings:
         """
         Set the embedding model.
 
@@ -81,9 +104,10 @@ class ChatbotModel:
             - HuggingFaceEmbeddings : The embedding model.
         """
 
-        return HuggingFaceEmbeddings(model_name=model_name, 
-                                     model_kwargs={"device": device}, 
-                                     encode_kwargs={"normalize_embeddings": norm}, 
+        return HuggingFaceEmbeddings(model_name=model_name,
+                                     model_kwargs={"device": device},
+                                     encode_kwargs={"normalize_embeddings":
+                                                    norm},
                                      cache_folder=emb_cache)
 
     def __init_conversational_chain(self) -> ConversationalRetrievalChain:
@@ -94,19 +118,23 @@ class ChatbotModel:
             - ConversationalRetrievalChain : The conversational chain.
         """
 
-        chroma = Chroma(persist_directory="./chromadb", embedding_function=self.model)
+        chroma = Chroma(persist_directory=os.path.join(
+            os.path.dirname(__file__), "chromadb"),
+                        embedding_function=self.model)
 
-        return RetrievalQA.from_chain_type(llm=self.llm, 
-                                    retriever=chroma.as_retriever(), 
-                                    chain_type_kwargs={"prompt":self.prompt_template}, 
-                                    verbose=True)
+        return RetrievalQA.from_chain_type(llm=self.llm,
+                                           retriever=chroma.as_retriever(),
+                                           chain_type_kwargs={
+                                               "prompt": self.prompt_template},
+                                           verbose=True)
+
 
 class StreamingGradioCallbackHandler(BaseCallbackHandler):
     """
     StreamingGradioCallbackHandler class to handle the callbacks.
     """
 
-    def __init__(self, 
+    def __init__(self,
                  q: SimpleQueue) -> None:
         """
         Initialize the StreamingGradioCallbackHandler class.
@@ -117,13 +145,13 @@ class StreamingGradioCallbackHandler(BaseCallbackHandler):
 
         self.q = q
 
-    def on_llm_start(self, 
-                     serialized: Dict[str, Any], 
-                     prompts: List[str], 
+    def on_llm_start(self,
+                     serialized: Dict[str, Any],
+                     prompts: List[str],
                      **kwargs: Any) -> None:
         """
         Handle the LLM start.
-        
+
         Args:
             - serialized : Dict[str, Any] : The serialized dictionary.
             - prompts : List[str] : The list of prompts.
@@ -171,13 +199,14 @@ class StreamingGradioCallbackHandler(BaseCallbackHandler):
 
         self.q.put(job_done)
 
+
 class StreamingChatbot:
     """
     StreamingChatbot class to handle the streaming chatbot.
     """
 
-    def __init__(self, 
-                 model : ChatbotModel) -> None:
+    def __init__(self,
+                 model: ChatbotModel) -> None:
         """
         Initialize the StreamingChatbot class.
 
@@ -190,9 +219,9 @@ class StreamingChatbot:
         self.q = SimpleQueue()
         self.model.llm.callbacks = [StreamingGradioCallbackHandler(self.q)]
 
-    def add_text(self, 
-                 history : List[List[str]], 
-                 text : str) -> Tuple[List[List[str]], str]:
+    def add_text(self,
+                 history: List[List[str]],
+                 text: str) -> Tuple[List[List[str]], str]:
         """
         Add text to the history.
 
@@ -208,7 +237,7 @@ class StreamingChatbot:
         return history, ""
 
     def process_question(self,
-                         question : str) -> str:
+                         question: str) -> str:
         """
         Process the question.
 
@@ -223,7 +252,8 @@ class StreamingChatbot:
         return response["result"]
 
     def streaming_chatbot(self,
-                          history : List[List[str]]) -> Generator[List[List[str]], None, None]:
+                          history: List[List[str]]
+                          ) -> Generator[List[List[str]], None, None]:
         """
         Streaming chatbot.
 
@@ -246,14 +276,14 @@ class StreamingChatbot:
             yield history
         thread.join()
 
+
 class GradioInterface:
     """
     GradioInterface class to handle the Gradio interface.
     """
 
-
-    def __init__(self, 
-                 streaming_chatbot : StreamingChatbot) -> None:
+    def __init__(self,
+                 streaming_chatbot: StreamingChatbot) -> None:
         """
         Initialize the GradioInterface class.
 
@@ -269,49 +299,65 @@ class GradioInterface:
         Setup the interface.
         """
 
-        bot_logo = "https://cdn0.iconfinder.com/data/icons/famous-character-vol-1-colored/48/JD-34-512.png"
+        bot_logo = (
+            "https://cdn0.iconfinder.com/"
+            "data/icons/famous-character-vol-1-colored/"
+            "48/JD-34-512.png"
+        )
 
         with gr.Blocks(theme=gr.themes.Monochrome()) as self.demo:
             gr.Markdown("""# 🤖 My personnal agent 🤖
                         You can ask to my assistant (almost) anything about me.
 
-                        You are in the docker container 🐳 version of the assistant 
+                        You are in the docker container 🐳
+                        version of the assistant
                         An other version is available on my huggingface space 🤗
                         """)
-            self.demo.load(None, 
-                           None, 
-                           js=""" () => { const params = new URLSearchParams(window.location.search); if (!params.has('__theme')) { params.set('__theme', 'dark'); window.location.search = params.toString(); } } """)
-            LangChain = gr.Chatbot(label="Assistant", 
-                                   height=250, 
-                                   avatar_images=(bot_logo, None), 
+            self.demo.load(None,
+                           None,
+                           js=""" () => { const params =
+                           new URLSearchParams(window.location.search);
+                           if (!params.has('__theme')) {
+                            params.set('__theme', 'dark');
+                            window.location.search = params.toString(); } }
+                            """)
+            LangChain = gr.Chatbot(label="Assistant",
+                                   height=250,
+                                   avatar_images=(bot_logo, None),
                                    layout="bubble")
-            Question = gr.Textbox(label="Your question", 
-                                  placeholder="Ask a question about Ilan", 
+            Question = gr.Textbox(label="Your question",
+                                  placeholder="Ask a question about Ilan",
                                   lines=2)
             sub_button = gr.Button("Submit")
-            sub_button.click(self.streaming_chatbot.add_text, 
-                             [LangChain, Question], 
-                             [LangChain, Question]).then(self.streaming_chatbot.streaming_chatbot, LangChain, LangChain)
+            sub_button.click(self.streaming_chatbot.add_text,
+                             [LangChain, Question],
+                             [LangChain, Question]).then(
+                                 self.streaming_chatbot.streaming_chatbot,
+                                 LangChain, LangChain)
 
-    def launch(self, port : int) -> None:
+    def launch(self,
+               port: int) -> None:
         """
         Launch the interface.
         """
 
-        self.demo.queue().launch(share=False, server_port=port, server_name="0.0.0.0")
+        self.demo.queue().launch(share=False,
+                                 server_port=port,
+                                 server_name="0.0.0.0")
+
 
 if __name__ == "__main__":
     """
     Main function to launch the chatbot.
     """
 
-    model = ChatbotModel(os.getenv("MODEL_NAME"), 
-                         os.getenv("DEVICE"), 
-                         True, 
-                         os.getenv("EMB_CACHE"), 
-                         os.getenv("LLM_PATH"), 
-                         0.6, 
-                         1, 
+    model = ChatbotModel(os.getenv("MODEL_NAME"),
+                         os.getenv("DEVICE"),
+                         True,
+                         os.getenv("EMB_CACHE"),
+                         os.getenv("LLM_PATH"),
+                         0.6,
+                         1,
                          100)
     chatbot = StreamingChatbot(model)
     interface = GradioInterface(chatbot)
