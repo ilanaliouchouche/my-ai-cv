@@ -2,5 +2,5 @@ python-dotenv==1.0.0
 langchain==0.1.20
 llama_cpp_python
 sentence-transformers==2.7.0
-gradio==4.31.2
+gradio==4.36.0
 chromadb==0.5.0
