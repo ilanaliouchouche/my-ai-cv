@@ -3,10 +3,13 @@
 ## Overview
 `my-ai-cv` is a project implementing a Retrieve Augmented Generation pipeline using a quantized tiny LLM with GGUF, designed to work across any device. This enables the use of the model without directly pushing it to the repository, as it is available within the container.
 
+An Hugging Face Space version 🤗 is available [here](https://huggingface.co/spaces/ilanaliouchouche/assistant).
+
 ## Getting Started
 
 ### Prerequisites
 Before running the project, ensure you have Docker installed on your machine. If you do not have Docker, you can install it from [Docker's official site](https://www.docker.com/products/docker-desktop).
+
 
 ### Running the Project
 
