@@ -27,7 +27,7 @@ The model currently in the container is: [microsoft/Phi-3-mini-4k-instruct-gguf]
 #### Option 2: Cloning and Running Locally
 1. Clone the repository and install dependencies:
    ```bash
-   git clone https://github.com/yourusername/my-ai-cv.git
+   git clone https://github.com/ilanaliouchouche/my-ai-cv.git
    cd my-ai-cv/assistant
    pip install -r requirements.txt
    ```
