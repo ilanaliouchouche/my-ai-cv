@@ -25,10 +25,11 @@ docker run -p 7860:7860 -d ghcr.io/ilanaliouchouche/my-cv
 The model currently in the container is: [microsoft/Phi-3-mini-4k-instruct-gguf](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-gguf)
 
 #### Option 2: Cloning and Running Locally
-1. Clone the repository:
+1. Clone the repository and install dependencies:
    ```bash
    git clone https://github.com/yourusername/my-ai-cv.git
    cd my-ai-cv/assistant
+   pip install -r requirements.txt
    ```
 
 2. Ensure the `assistant/models` directory is created and populated as the model files are not pushed to the repository due to their size. Place the model files inside this directory.
